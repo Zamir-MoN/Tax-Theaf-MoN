@@ -5,6 +5,7 @@ import { Plus, Trash2, Edit } from 'lucide-react';
 const Accounts = () => {
   const [accounts, setAccounts] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({ gameName: '', username: '', password: '', imageUrl: '' });
 
   const fetchAccounts = async () => {
@@ -20,12 +21,29 @@ const Accounts = () => {
     fetchAccounts();
   }, []);
 
+  const handleAdd = () => {
+    setEditId(null);
+    setFormData({ gameName: '', username: '', password: '', imageUrl: '' });
+    setShowModal(true);
+  };
+
+  const handleEdit = (acc) => {
+    setEditId(acc._id);
+    setFormData({ gameName: acc.gameName, username: acc.username, password: acc.password, imageUrl: acc.imageUrl || '' });
+    setShowModal(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/accounts', formData);
+      if (editId) {
+        await api.put(`/accounts/${editId}`, formData);
+      } else {
+        await api.post('/accounts', formData);
+      }
       setShowModal(false);
       setFormData({ gameName: '', username: '', password: '', imageUrl: '' });
+      setEditId(null);
       fetchAccounts();
     } catch (error) {
       console.error(error);
@@ -48,7 +66,7 @@ const Accounts = () => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-white">Manage Accounts</h1>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={handleAdd}
           className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
         >
           <Plus className="w-5 h-5" />
@@ -89,9 +107,14 @@ const Accounts = () => {
                   </div>
                 </td>
                 <td className="p-4 text-right">
-                  <button onClick={() => handleDelete(acc._id)} className="text-red-500 hover:text-red-400 p-2">
-                    <Trash2 className="w-5 h-5" />
-                  </button>
+                  <div className="flex justify-end space-x-2">
+                    <button onClick={() => handleEdit(acc)} className="text-blue-500 hover:text-blue-400 p-2" title="Edit">
+                      <Edit className="w-5 h-5" />
+                    </button>
+                    <button onClick={() => handleDelete(acc._id)} className="text-red-500 hover:text-red-400 p-2" title="Delete">
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -105,7 +128,7 @@ const Accounts = () => {
       {showModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-dark-800 p-8 rounded-2xl border border-dark-700 w-full max-w-md">
-            <h2 className="text-2xl font-bold text-white mb-6">Add New Account</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{editId ? 'Edit Account' : 'Add New Account'}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Game Name</label>
