@@ -40,11 +40,7 @@ export default {
       return interaction.editReply({ content: 'You do not have the required role to claim game accounts.', ephemeral: true });
     }
 
-    // Check if user has a pending review
-    const pendingClaim = await Claim.findOne({ userId: interaction.user.id, reviewStatus: 'pending' });
-    if (pendingClaim) {
-      return interaction.editReply({ content: 'You have a pending account review! Please check your DMs and submit your review (Working / Not Working) before claiming a new account.', ephemeral: true });
-    }
+
 
     const gameName = interaction.options.getString('game');
 
