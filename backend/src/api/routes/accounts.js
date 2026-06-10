@@ -1,17 +1,35 @@
 import express from 'express';
 import Account from '../../models/Account.js';
 import Log from '../../models/Log.js';
+import Claim from '../../models/Claim.js';
 import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
 // @route   GET /api/accounts
-// @desc    Get all accounts (optional query: ?status=available)
+// @desc    Get all accounts with claim statistics
 router.get('/', protect, async (req, res) => {
   try {
     const query = req.query.status ? { status: req.query.status } : {};
-    const accounts = await Account.find(query).sort({ createdAt: -1 });
-    res.json(accounts);
+    const accounts = await Account.find(query).sort({ createdAt: -1 }).lean();
+    
+    const accountIds = accounts.map(a => a._id);
+    const claims = await Claim.find({ accountId: { $in: accountIds } });
+    
+    const enrichedAccounts = accounts.map(account => {
+      const accountClaims = claims.filter(c => c.accountId.toString() === account._id.toString());
+      const working = accountClaims.filter(c => c.reviewStatus === 'working').length;
+      const notWorking = accountClaims.filter(c => c.reviewStatus === 'not_working').length;
+      
+      return {
+        ...account,
+        totalClaims: accountClaims.length,
+        working,
+        notWorking
+      };
+    });
+
+    res.json(enrichedAccounts);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

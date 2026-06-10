@@ -2,7 +2,7 @@ import { Events, EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, A
 import VerificationCode from '../../models/VerificationCode.js';
 import Account from '../../models/Account.js';
 import Log from '../../models/Log.js';
-
+import Claim from '../../models/Claim.js';
 export default {
   name: Events.InteractionCreate,
   async execute(interaction, client) {
@@ -33,6 +33,19 @@ export default {
     } else if (interaction.isButton()) {
       if (interaction.customId === 'cancel_claim') {
         await interaction.update({ content: 'Claim cancelled.', components: [], embeds: [] });
+      } else if (interaction.customId.startsWith('review_')) {
+        const isWorking = interaction.customId.startsWith('review_working_');
+        const claimId = interaction.customId.replace(isWorking ? 'review_working_' : 'review_not_working_', '');
+        
+        const claim = await Claim.findById(claimId);
+        if (!claim) {
+            return interaction.update({ content: 'Review already submitted or claim not found.', components: [] });
+        }
+        
+        claim.reviewStatus = isWorking ? 'working' : 'not_working';
+        await claim.save();
+        
+        await interaction.update({ content: 'Thank you for your review!', components: [] });
       } else if (interaction.customId === 'activate_claim') {
         const modal = new ModalBuilder()
           .setCustomId('verification_modal')
@@ -64,18 +77,20 @@ export default {
             return interaction.reply({ content: 'Invalid or expired verification code!', ephemeral: true });
         }
 
-        if (verificationRecord.accountId.status !== 'processing') {
-            return interaction.reply({ content: 'This account is no longer available.', ephemeral: true });
-        }
-
         verificationRecord.used = true;
         await verificationRecord.save();
 
         const account = verificationRecord.accountId;
-        account.status = 'claimed';
-        account.claimedBy = interaction.user.id;
-        account.claimedDate = new Date();
-        await account.save();
+        
+        if (account.status !== 'available') {
+            return interaction.reply({ content: 'This account is currently disabled and unavailable.', ephemeral: true });
+        }
+
+        const claim = await Claim.create({
+            userId: interaction.user.id,
+            accountId: account._id,
+            reviewStatus: 'pending'
+        });
 
         const dmEmbed = new EmbedBuilder()
             .setTitle('Here is your Account!')
@@ -90,8 +105,20 @@ export default {
             dmEmbed.setImage(account.imageUrl);
         }
 
+        const workingBtn = new ButtonBuilder()
+            .setCustomId(`review_working_${claim._id}`)
+            .setLabel('✅ Working')
+            .setStyle(ButtonStyle.Success);
+
+        const notWorkingBtn = new ButtonBuilder()
+            .setCustomId(`review_not_working_${claim._id}`)
+            .setLabel('❌ Not Working')
+            .setStyle(ButtonStyle.Danger);
+
+        const dmRow = new ActionRowBuilder().addComponents(workingBtn, notWorkingBtn);
+
         try {
-            await interaction.user.send({ embeds: [dmEmbed] });
+            await interaction.user.send({ embeds: [dmEmbed], components: [dmRow] });
             await interaction.reply({ content: 'Account details have been sent to your DMs!', ephemeral: true });
 
             await Log.create({
@@ -103,10 +130,7 @@ export default {
 
         } catch (e) {
             console.error("Failed to send DM", e);
-            account.status = 'available';
-            account.claimedBy = null;
-            account.claimedDate = null;
-            await account.save();
+            await Claim.findByIdAndDelete(claim._id);
             await interaction.reply({ content: 'Failed to send DM. Make sure your DMs are open!', ephemeral: true });
         }
       }

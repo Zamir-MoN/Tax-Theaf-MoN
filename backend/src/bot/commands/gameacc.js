@@ -2,7 +2,7 @@ import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, But
 import Account from '../../models/Account.js';
 import Guild from '../../models/Guild.js';
 import VerificationCode from '../../models/VerificationCode.js';
-
+import Claim from '../../models/Claim.js';
 export default {
   data: new SlashCommandBuilder()
     .setName('gameacc')
@@ -39,15 +39,16 @@ export default {
       return interaction.reply({ content: 'You do not have the required role to claim game accounts.', ephemeral: true });
     }
 
+    // Check if user has a pending review
+    const pendingClaim = await Claim.findOne({ userId: interaction.user.id, reviewStatus: 'pending' });
+    if (pendingClaim) {
+      return interaction.reply({ content: 'You have a pending account review! Please check your DMs and submit your review (Working / Not Working) before claiming a new account.', ephemeral: true });
+    }
+
     const gameName = interaction.options.getString('game');
 
-    // Find one available account and atomically lock it by setting status to 'processing'
-    // This prevents multiple users from grabbing the same account concurrently
-    const account = await Account.findOneAndUpdate(
-        { gameName: gameName, status: 'available' },
-        { status: 'processing' },
-        { new: true }
-    );
+    // Fetch any available account
+    const account = await Account.findOne({ gameName: gameName, status: 'available' });
 
     if (!account) {
         return interaction.reply({ content: `Sorry, there are no available accounts for **${gameName}** at the moment.`, ephemeral: true });
@@ -82,19 +83,5 @@ export default {
 
     await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
 
-    // Since the verification code is set to expire in 30s via TTL index, 
-    // we also need to ensure the account lock is released if it expires.
-    // We can set a timeout here to revert the account status if it's still 'processing' after 35s.
-    setTimeout(async () => {
-        try {
-            const accCheck = await Account.findById(account._id);
-            if (accCheck && accCheck.status === 'processing') {
-                accCheck.status = 'available';
-                await accCheck.save();
-            }
-        } catch(e) {
-            console.error("Error releasing account lock:", e);
-        }
-    }, 35000);
   },
 };

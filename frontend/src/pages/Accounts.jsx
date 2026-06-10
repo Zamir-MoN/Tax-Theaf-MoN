@@ -63,7 +63,8 @@ const Accounts = () => {
               <th className="p-4 font-medium">Game</th>
               <th className="p-4 font-medium">Username</th>
               <th className="p-4 font-medium">Status</th>
-              <th className="p-4 font-medium">Claimed By</th>
+              <th className="p-4 font-medium text-center">Total Claims</th>
+              <th className="p-4 font-medium text-center">Reviews</th>
               <th className="p-4 font-medium text-right">Actions</th>
             </tr>
           </thead>
@@ -75,13 +76,18 @@ const Accounts = () => {
                 <td className="p-4">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                     acc.status === 'available' ? 'bg-green-500/10 text-green-500' :
-                    acc.status === 'claimed' ? 'bg-purple-500/10 text-purple-500' :
-                    'bg-yellow-500/10 text-yellow-500'
+                    'bg-red-500/10 text-red-500'
                   }`}>
                     {acc.status.toUpperCase()}
                   </span>
                 </td>
-                <td className="p-4 text-gray-400">{acc.claimedBy || '-'}</td>
+                <td className="p-4 text-center text-white font-bold">{acc.totalClaims || 0}</td>
+                <td className="p-4 text-center">
+                  <div className="flex items-center justify-center space-x-4 text-sm">
+                    <span className="text-green-400 font-medium">✅ {acc.working || 0}</span>
+                    <span className="text-red-400 font-medium">❌ {acc.notWorking || 0}</span>
+                  </div>
+                </td>
                 <td className="p-4 text-right">
                   <button onClick={() => handleDelete(acc._id)} className="text-red-500 hover:text-red-400 p-2">
                     <Trash2 className="w-5 h-5" />

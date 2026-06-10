@@ -21,16 +21,8 @@ const accountSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['available', 'claimed', 'processing'],
+      enum: ['available', 'disabled'],
       default: 'available',
-    },
-    claimedBy: {
-      type: String,
-      default: null,
-    },
-    claimedDate: {
-      type: Date,
-      default: null,
     },
   },
   {
