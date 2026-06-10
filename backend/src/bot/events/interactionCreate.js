@@ -45,7 +45,7 @@ export default {
         claim.reviewStatus = isWorking ? 'working' : 'not_working';
         await claim.save();
         
-        await interaction.update({ content: 'Thank you for your review!', components: [] });
+        await interaction.update({ content: '<a:verify1:1379122332332720138> Thank you for your review!', components: [] });
       } else if (interaction.customId === 'activate_claim') {
         const modal = new ModalBuilder()
           .setCustomId('verification_modal')
@@ -75,7 +75,7 @@ export default {
         }).populate('accountId');
 
         if (!verificationRecord) {
-            return interaction.editReply({ content: 'Invalid or expired verification code!' });
+            return interaction.editReply({ content: '<a:verifiedred:1379144264885211317> Invalid or expired verification code!' });
         }
 
         verificationRecord.used = true;
@@ -84,7 +84,7 @@ export default {
         const account = verificationRecord.accountId;
         
         if (account.status !== 'available') {
-            return interaction.editReply({ content: 'This account is currently disabled and unavailable.' });
+            return interaction.editReply({ content: '<a:verifiedred:1379144264885211317> This account is currently disabled and unavailable.' });
         }
 
         const claim = await Claim.create({
@@ -108,19 +108,21 @@ export default {
 
         const workingBtn = new ButtonBuilder()
             .setCustomId(`review_working_${claim._id}`)
-            .setLabel('✅ Working')
+            .setLabel('Working')
+            .setEmoji({ id: '1379122332332720138', name: 'verify1', animated: true })
             .setStyle(ButtonStyle.Success);
 
         const notWorkingBtn = new ButtonBuilder()
             .setCustomId(`review_not_working_${claim._id}`)
-            .setLabel('❌ Not Working')
+            .setLabel('Not Working')
+            .setEmoji({ id: '1379144264885211317', name: 'verifiedred', animated: true })
             .setStyle(ButtonStyle.Danger);
 
         const dmRow = new ActionRowBuilder().addComponents(workingBtn, notWorkingBtn);
 
         try {
             await interaction.user.send({ embeds: [dmEmbed], components: [dmRow] });
-            await interaction.editReply({ content: 'Account details have been sent to your DMs!' });
+            await interaction.editReply({ content: '<a:verify1:1379122332332720138> Account details have been sent to your DMs!' });
 
             await Log.create({
                 action: 'account_claimed',
@@ -132,7 +134,7 @@ export default {
         } catch (e) {
             console.error("Failed to send DM", e);
             await Claim.findByIdAndDelete(claim._id);
-            await interaction.editReply({ content: 'Failed to send DM. Make sure your DMs are open!' });
+            await interaction.editReply({ content: '<a:verifiedred:1379144264885211317> Failed to send DM. Make sure your DMs are open!' });
         }
       }
     }
