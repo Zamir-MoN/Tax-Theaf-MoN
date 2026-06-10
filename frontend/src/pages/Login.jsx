@@ -31,14 +31,14 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Email Address</label>
+            <label className="block text-sm font-medium text-gray-400 mb-2">Username / Email</label>
             <input
-              type="email"
+              type="text"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-dark-900 border border-dark-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-colors"
-              placeholder="admin@example.com"
+              placeholder="admin"
             />
           </div>
           <div>
