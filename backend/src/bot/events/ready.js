@@ -32,9 +32,8 @@ export default {
       try {
         await client.application.fetch();
         const ownerId = client.application.owner?.id || client.application.owner?.ownerId;
-        const ownerMention = ownerId ? `[zamir_main](https://discord.com/users/${ownerId})` : 'zamir_main';
-
-        const newDescription = `🎮 Your Automated Game Account Distributor!\n\n🛠️ Developed by ${ownerMention}`;
+        const ownerIdToUse = ownerId || '1390721413622534296';
+        const newDescription = `🎮 Your Automated Game Account Distributor!\n\n🛠️ Developed by zamir_main\n🔗 Contact: https://discord.com/users/${ownerIdToUse}`;
         
         if (client.application.description !== newDescription) {
             await client.application.edit({ description: newDescription }).catch(console.error);
