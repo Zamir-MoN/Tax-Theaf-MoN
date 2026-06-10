@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: discord-giveaway-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: discord-giveaway-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongodb:27017/discord-giveaway
+      - JWT_SECRET=your_jwt_secret_here
+      - DISCORD_TOKEN=your_discord_token_here
+      - DISCORD_CLIENT_ID=your_discord_client_id_here
+      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_PASSWORD=adminpass123
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: discord-giveaway-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
