@@ -51,9 +51,9 @@ export default {
         const availableCount = await Account.countDocuments({ status: 'available' });
         
         const statuses = [
-          { text: `${availableCount} game accounts available!`, type: ActivityType.Watching },
-          { text: `/gameacc to claim an account`, type: ActivityType.Playing },
-          { text: `Developed by zamir_main`, type: ActivityType.Listening }
+          { text: `🎮 ${availableCount} game accounts available!`, type: ActivityType.Watching },
+          { text: `🚀 /gameacc to claim an account`, type: ActivityType.Playing },
+          { text: `🛠️ Developed by zamir_main`, type: ActivityType.Listening }
         ];
         
         const currentStatus = statuses[statusIndex % statuses.length];
