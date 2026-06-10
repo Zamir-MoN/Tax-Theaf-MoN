@@ -27,14 +27,9 @@ export default {
       console.error(error);
     }
 
-    // Dynamic Status and Description
-    const updateStatus = async () => {
+    // Run description update once on startup
+    const initDescription = async () => {
       try {
-        const availableCount = await Account.countDocuments({ status: 'available' });
-        
-        client.user.setActivity(`${availableCount} game accounts available!`, { type: ActivityType.Watching });
-
-        // Update App Description (Rate limited, so we only do it on startup)
         await client.application.fetch();
         const ownerId = client.application.owner?.id || client.application.owner?.ownerId;
         const ownerMention = ownerId ? `<@${ownerId}>` : 'zamir_main';
@@ -45,14 +40,34 @@ export default {
             await client.application.edit({ description: newDescription }).catch(console.error);
         }
       } catch (err) {
+        console.error('Failed to update description:', err);
+      }
+    };
+    await initDescription();
+
+    // Rotating Status Text
+    let statusIndex = 0;
+    const updateActivity = async () => {
+      try {
+        const availableCount = await Account.countDocuments({ status: 'available' });
+        
+        const statuses = [
+          { text: `${availableCount} game accounts available!`, type: ActivityType.Watching },
+          { text: `/gameacc to claim an account`, type: ActivityType.Playing },
+          { text: `Developed by zamir_main`, type: ActivityType.Listening }
+        ];
+        
+        const currentStatus = statuses[statusIndex % statuses.length];
+        client.user.setActivity(currentStatus.text, { type: currentStatus.type });
+        
+        statusIndex++;
+      } catch (err) {
         console.error('Failed to update status:', err);
       }
     };
 
-    // Run once on startup
-    await updateStatus();
-    
-    // Update activity every 5 minutes
-    setInterval(updateStatus, 5 * 60 * 1000);
+    // Run once immediately, then every 15 seconds
+    await updateActivity();
+    setInterval(updateActivity, 15 * 1000);
   },
 };
