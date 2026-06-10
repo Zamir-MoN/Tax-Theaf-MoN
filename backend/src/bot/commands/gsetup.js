@@ -7,12 +7,12 @@ export default {
     .setName('gsetup')
     .setDescription('Configure the bot for this server')
     .addRoleOption(option => 
-      option.setName('admin_role')
-        .setDescription('Select the role that manages bot commands')
+      option.setName('access_role')
+        .setDescription('Select the role required to claim game accounts')
         .setRequired(true))
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   async execute(interaction) {
-    const role = interaction.options.getRole('admin_role');
+    const role = interaction.options.getRole('access_role');
     const authCode = `AUTH-${Math.floor(1000 + Math.random() * 9000)}`;
 
     try {

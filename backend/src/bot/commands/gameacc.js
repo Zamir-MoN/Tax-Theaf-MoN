@@ -34,6 +34,11 @@ export default {
       return interaction.reply({ content: 'This server is not approved to use the bot. Please run `/gsetup` and contact an admin.', ephemeral: true });
     }
 
+    // Check if user has the required access role
+    if (!interaction.member.roles.cache.has(guild.authorizedRoleId)) {
+      return interaction.reply({ content: 'You do not have the required role to claim game accounts.', ephemeral: true });
+    }
+
     const gameName = interaction.options.getString('game');
 
     // Find one available account and atomically lock it by setting status to 'processing'
