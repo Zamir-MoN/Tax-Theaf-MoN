@@ -32,7 +32,7 @@ export default {
       try {
         await client.application.fetch();
         const ownerId = client.application.owner?.id || client.application.owner?.ownerId;
-        const ownerMention = ownerId ? `<@${ownerId}>` : 'zamir_main';
+        const ownerMention = ownerId ? `[zamir_main](https://discord.com/users/${ownerId})` : 'zamir_main';
 
         const newDescription = `🎮 Your Automated Game Account Distributor!\n\n🛠️ Developed by ${ownerMention}`;
         
