@@ -1,4 +1,4 @@
-import { Events, EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } from 'discord.js';
+import { Events, EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import VerificationCode from '../../models/VerificationCode.js';
 import Account from '../../models/Account.js';
 import Log from '../../models/Log.js';
