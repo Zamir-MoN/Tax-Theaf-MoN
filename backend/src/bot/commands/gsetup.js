@@ -10,10 +10,15 @@ export default {
       option.setName('access_role')
         .setDescription('Select the role required to claim game accounts')
         .setRequired(true))
+    .addChannelOption(option =>
+      option.setName('command_channel')
+        .setDescription('Select the channel where /gameacc can be used')
+        .setRequired(true))
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   async execute(interaction) {
     await interaction.deferReply();
     const role = interaction.options.getRole('access_role');
+    const channel = interaction.options.getChannel('command_channel');
     const authCode = `AUTH-${Math.floor(1000 + Math.random() * 9000)}`;
 
     try {
@@ -22,6 +27,7 @@ export default {
       if (guildRecord) {
         guildRecord.guildName = interaction.guild.name;
         guildRecord.authorizedRoleId = role.id;
+        guildRecord.commandChannelId = channel.id;
         guildRecord.setupCode = authCode;
         guildRecord.approved = false; // reset approval on re-setup? Or keep it? The prompt says "Guild remains pending approval". Let's reset.
         await guildRecord.save();
@@ -30,6 +36,7 @@ export default {
           guildId: interaction.guildId,
           guildName: interaction.guild.name,
           authorizedRoleId: role.id,
+          commandChannelId: channel.id,
           setupCode: authCode,
           approved: false,
         });

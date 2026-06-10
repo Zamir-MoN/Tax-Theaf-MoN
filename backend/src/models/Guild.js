@@ -14,6 +14,9 @@ const guildSchema = mongoose.Schema(
     authorizedRoleId: {
       type: String,
     },
+    commandChannelId: {
+      type: String,
+    },
     setupCode: {
       type: String,
     },

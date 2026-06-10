@@ -35,6 +35,11 @@ export default {
       return interaction.editReply({ content: 'This server is not approved to use the bot. Please run `/gsetup` and contact an admin.', ephemeral: true });
     }
 
+    // Check if command is used in the designated channel
+    if (guild.commandChannelId && interaction.channelId !== guild.commandChannelId) {
+      return interaction.editReply({ content: `You can only use this command in <#${guild.commandChannelId}>.`, ephemeral: true });
+    }
+
     // Check if user has the required access role
     if (!interaction.member.roles.cache.has(guild.authorizedRoleId)) {
       return interaction.editReply({ content: 'You do not have the required role to claim game accounts.', ephemeral: true });
