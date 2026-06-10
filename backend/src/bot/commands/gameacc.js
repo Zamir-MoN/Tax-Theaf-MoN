@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
-import Account from '../../../models/Account.js';
-import Guild from '../../../models/Guild.js';
-import VerificationCode from '../../../models/VerificationCode.js';
+import Account from '../../models/Account.js';
+import Guild from '../../models/Guild.js';
+import VerificationCode from '../../models/VerificationCode.js';
 
 export default {
   data: new SlashCommandBuilder()

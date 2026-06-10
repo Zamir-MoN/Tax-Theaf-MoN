@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import Account from '../../../models/Account.js';
-import Guild from '../../../models/Guild.js';
+import Account from '../../models/Account.js';
+import Guild from '../../models/Guild.js';
 
 export default {
   data: new SlashCommandBuilder()

@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
-import Guild from '../../../models/Guild.js';
-import Log from '../../../models/Log.js';
+import Guild from '../../models/Guild.js';
+import Log from '../../models/Log.js';
 
 export default {
   data: new SlashCommandBuilder()
