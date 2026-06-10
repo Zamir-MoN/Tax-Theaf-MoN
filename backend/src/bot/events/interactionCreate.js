@@ -66,6 +66,7 @@ export default {
       }
     } else if (interaction.isModalSubmit()) {
       if (interaction.customId === 'verification_modal') {
+        await interaction.deferReply({ ephemeral: true });
         const enteredCode = interaction.fields.getTextInputValue('code_input');
         const verificationRecord = await VerificationCode.findOne({ 
             userId: interaction.user.id, 
@@ -74,7 +75,7 @@ export default {
         }).populate('accountId');
 
         if (!verificationRecord) {
-            return interaction.reply({ content: 'Invalid or expired verification code!', ephemeral: true });
+            return interaction.editReply({ content: 'Invalid or expired verification code!' });
         }
 
         verificationRecord.used = true;
@@ -83,7 +84,7 @@ export default {
         const account = verificationRecord.accountId;
         
         if (account.status !== 'available') {
-            return interaction.reply({ content: 'This account is currently disabled and unavailable.', ephemeral: true });
+            return interaction.editReply({ content: 'This account is currently disabled and unavailable.' });
         }
 
         const claim = await Claim.create({
@@ -119,7 +120,7 @@ export default {
 
         try {
             await interaction.user.send({ embeds: [dmEmbed], components: [dmRow] });
-            await interaction.reply({ content: 'Account details have been sent to your DMs!', ephemeral: true });
+            await interaction.editReply({ content: 'Account details have been sent to your DMs!' });
 
             await Log.create({
                 action: 'account_claimed',
@@ -131,7 +132,7 @@ export default {
         } catch (e) {
             console.error("Failed to send DM", e);
             await Claim.findByIdAndDelete(claim._id);
-            await interaction.reply({ content: 'Failed to send DM. Make sure your DMs are open!', ephemeral: true });
+            await interaction.editReply({ content: 'Failed to send DM. Make sure your DMs are open!' });
         }
       }
     }

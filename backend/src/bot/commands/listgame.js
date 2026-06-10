@@ -7,10 +7,11 @@ export default {
     .setName('listgame')
     .setDescription('Shows available games.'),
   async execute(interaction) {
+    await interaction.deferReply();
     // Check if guild is approved
     const guild = await Guild.findOne({ guildId: interaction.guildId });
     if (!guild || !guild.approved) {
-      return interaction.reply({ content: 'This server is not approved to use the bot. Please run `/gsetup` and contact an admin.', ephemeral: true });
+      return interaction.editReply({ content: 'This server is not approved to use the bot. Please run `/gsetup` and contact an admin.', ephemeral: true });
     }
 
     try {
@@ -22,7 +23,7 @@ export default {
       ]);
 
       if (availableGames.length === 0) {
-        return interaction.reply({ content: 'There are currently no accounts available.', ephemeral: true });
+        return interaction.editReply({ content: 'There are currently no accounts available.', ephemeral: true });
       }
 
       const embed = new EmbedBuilder()
@@ -36,10 +37,10 @@ export default {
 
       embed.setDescription(description);
 
-      await interaction.reply({ embeds: [embed] });
+      await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       console.error(error);
-      await interaction.reply({ content: 'Failed to fetch available games.', ephemeral: true });
+      await interaction.editReply({ content: 'Failed to fetch available games.', ephemeral: true });
     }
   },
 };

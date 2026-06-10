@@ -28,21 +28,22 @@ export default {
   },
 
   async execute(interaction) {
+    await interaction.deferReply({ ephemeral: true });
     // Check if guild is approved
     const guild = await Guild.findOne({ guildId: interaction.guildId });
     if (!guild || !guild.approved) {
-      return interaction.reply({ content: 'This server is not approved to use the bot. Please run `/gsetup` and contact an admin.', ephemeral: true });
+      return interaction.editReply({ content: 'This server is not approved to use the bot. Please run `/gsetup` and contact an admin.', ephemeral: true });
     }
 
     // Check if user has the required access role
     if (!interaction.member.roles.cache.has(guild.authorizedRoleId)) {
-      return interaction.reply({ content: 'You do not have the required role to claim game accounts.', ephemeral: true });
+      return interaction.editReply({ content: 'You do not have the required role to claim game accounts.', ephemeral: true });
     }
 
     // Check if user has a pending review
     const pendingClaim = await Claim.findOne({ userId: interaction.user.id, reviewStatus: 'pending' });
     if (pendingClaim) {
-      return interaction.reply({ content: 'You have a pending account review! Please check your DMs and submit your review (Working / Not Working) before claiming a new account.', ephemeral: true });
+      return interaction.editReply({ content: 'You have a pending account review! Please check your DMs and submit your review (Working / Not Working) before claiming a new account.', ephemeral: true });
     }
 
     const gameName = interaction.options.getString('game');
@@ -51,7 +52,7 @@ export default {
     const account = await Account.findOne({ gameName: gameName, status: 'available' });
 
     if (!account) {
-        return interaction.reply({ content: `Sorry, there are no available accounts for **${gameName}** at the moment.`, ephemeral: true });
+        return interaction.editReply({ content: `Sorry, there are no available accounts for **${gameName}** at the moment.`, ephemeral: true });
     }
 
     // Generate random 4 digit code
@@ -81,7 +82,7 @@ export default {
 
     const row = new ActionRowBuilder().addComponents(activateBtn, cancelBtn);
 
-    await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+    await interaction.editReply({ embeds: [embed], components: [row], ephemeral: true });
 
   },
 };

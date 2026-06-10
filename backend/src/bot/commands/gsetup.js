@@ -12,6 +12,7 @@ export default {
         .setRequired(true))
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   async execute(interaction) {
+    await interaction.deferReply();
     const role = interaction.options.getRole('access_role');
     const authCode = `AUTH-${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -46,10 +47,10 @@ export default {
         .setDescription(`Authentication Code: \n**${authCode}**\n\nProvide this code to the Bot Administrator in the Web Dashboard to get your server approved. Features are disabled until approved.`)
         .setColor('#ffff00');
 
-      await interaction.reply({ embeds: [embed] });
+      await interaction.editReply({ embeds: [embed] });
     } catch (error) {
       console.error(error);
-      await interaction.reply({ content: 'Failed to complete setup.', ephemeral: true });
+      await interaction.editReply({ content: 'Failed to complete setup.', ephemeral: true });
     }
   },
 };
