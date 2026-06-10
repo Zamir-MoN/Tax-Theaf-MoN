@@ -13,7 +13,7 @@ export default {
         const embed = new EmbedBuilder()
           .setTitle('Hello!')
           .setDescription('Thank you for adding the bot.\n\nRun:\n`/gsetup`\n\nto configure the bot.')
-          .setColor('#00ff00');
+          .setColor('#ff1493');
 
         await defaultChannel.send({ embeds: [embed] });
       }

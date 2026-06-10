@@ -69,7 +69,7 @@ export default {
     const embed = new EmbedBuilder()
         .setTitle('Account Verification')
         .setDescription(`You requested a **${gameName}** account.\n\nEnter this code below and press Activate:\n\n# ${code}\n\n*Code expires in 30 seconds.*`)
-        .setColor('#00ff00');
+        .setColor('#ff1493');
 
     const activateBtn = new ButtonBuilder()
         .setCustomId('activate_claim')

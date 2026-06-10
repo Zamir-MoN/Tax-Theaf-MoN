@@ -100,7 +100,7 @@ export default {
                 { name: 'Username', value: account.username },
                 { name: 'Password', value: account.password }
             )
-            .setColor('#00ff00');
+            .setColor('#ff1493');
             
         if (account.imageUrl) {
             dmEmbed.setImage(account.imageUrl);

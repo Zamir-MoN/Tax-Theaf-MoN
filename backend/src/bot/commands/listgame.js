@@ -28,7 +28,7 @@ export default {
 
       const embed = new EmbedBuilder()
         .setTitle('Available Games')
-        .setColor('#00ff00');
+        .setColor('#ff1493');
 
       let description = '';
       for (const game of availableGames) {

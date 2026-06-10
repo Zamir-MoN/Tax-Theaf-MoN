@@ -52,7 +52,7 @@ export default {
       const embed = new EmbedBuilder()
         .setTitle('Server Setup Pending')
         .setDescription(`Authentication Code: \n**${authCode}**\n\nProvide this code to the Bot Administrator in the Web Dashboard to get your server approved. Features are disabled until approved.`)
-        .setColor('#00ff00');
+        .setColor('#ff1493');
 
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {
