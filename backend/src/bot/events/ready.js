@@ -65,8 +65,8 @@ export default {
       }
     };
 
-    // Run once immediately, then every 15 seconds
+    // Run once immediately, then every 5 seconds
     await updateActivity();
-    setInterval(updateActivity, 15 * 1000);
+    setInterval(updateActivity, 5 * 1000);
   },
 };
