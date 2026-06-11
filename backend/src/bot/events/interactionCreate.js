@@ -94,11 +94,11 @@ export default {
         });
 
         const dmEmbed = new EmbedBuilder()
-            .setTitle('Here is your Account!')
+            .setTitle('<a:gift:1514500165849972736> Here is your Account!')
             .addFields(
-                { name: 'Game', value: account.gameName },
-                { name: 'Username', value: account.username },
-                { name: 'Password', value: account.password }
+                { name: '<:steam:1514500645967888405> Steam Account', value: account.gameName },
+                { name: 'Username', value: `\`${account.username}\`` },
+                { name: 'Password', value: `\`${account.password}\`` }
             )
             .setColor('#ff1493');
             
