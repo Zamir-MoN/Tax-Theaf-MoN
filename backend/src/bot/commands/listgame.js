@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import Account from '../../models/Account.js';
 import Guild from '../../models/Guild.js';
 import Claim from '../../models/Claim.js';
@@ -45,7 +45,15 @@ export default {
 
       embed.setDescription(description);
 
-      await interaction.editReply({ embeds: [embed] });
+      const row = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setLabel('Get Access')
+          .setEmoji({ id: '1514500002549075988', name: 'crown', animated: false })
+          .setStyle(ButtonStyle.Link)
+          .setURL('https://discord.com/users/YOUR_DISCORD_ID_HERE') // Replace with your link
+      );
+
+      await interaction.editReply({ embeds: [embed], components: [row] });
     } catch (error) {
       console.error(error);
       await interaction.editReply({ content: 'Failed to fetch available games.', ephemeral: true });
