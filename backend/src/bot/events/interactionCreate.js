@@ -93,7 +93,9 @@ export default {
             reviewStatus: 'pending'
         });
 
-        const dmContent = 
+        const dmEmbed = new EmbedBuilder()
+            .setColor('#ff1493')
+            .setDescription(
 `<a:gift:1514500165849972736> **Here is your Account!**
 
 <:steam:1514500645967888405> **Steam Account**
@@ -114,7 +116,12 @@ ${account.gameName}
 > » Select "Go Offline" and confirm
 > » Click on Settings > Cloud and DISABLE it
 
-**Now, Click Play and enjoy your game anytime!**` + (account.imageUrl ? `\n\n${account.imageUrl}` : '');
+**Now, Click Play and enjoy your game anytime!**`
+            );
+
+        if (account.imageUrl) {
+            dmEmbed.setImage(account.imageUrl);
+        }
 
         const workingBtn = new ButtonBuilder()
             .setCustomId(`review_working_${claim._id}`)
@@ -131,7 +138,7 @@ ${account.gameName}
         const dmRow = new ActionRowBuilder().addComponents(workingBtn, notWorkingBtn);
 
         try {
-            await interaction.user.send({ content: dmContent, components: [dmRow] });
+            await interaction.user.send({ embeds: [dmEmbed], components: [dmRow] });
             await interaction.editReply({ content: '<a:gift:1514500165849972736> Account details have been sent to your DMs!' });
 
             await Log.create({
