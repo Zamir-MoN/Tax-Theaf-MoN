@@ -109,8 +109,8 @@ export default {
         const workingBtn = new ButtonBuilder()
             .setCustomId(`review_working_${claim._id}`)
             .setLabel('Working')
-            .setEmoji({ id: '1514500002549075988', name: 'crown', animated: false })
-            .setStyle(ButtonStyle.Success);
+            .setEmoji({ id: '1514500469827833977', name: 'greencheck', animated: true })
+            .setStyle(ButtonStyle.Secondary);
 
         const notWorkingBtn = new ButtonBuilder()
             .setCustomId(`review_not_working_${claim._id}`)
