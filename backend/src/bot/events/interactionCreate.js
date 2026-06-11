@@ -95,20 +95,21 @@ export default {
 
         const dmEmbed = new EmbedBuilder()
             .setTitle('<a:gift:1514500165849972736> Here is your Account!')
-            .setDescription(
-                `<a:arrow_white:1514499935125504080> Download the game\n` +
-                `<a:arrow_white:1514499935125504080> Launch the game once in online mode, then close it after 30 seconds (ALT + F4)\n` +
-                `<a:arrow_white:1514499935125504080> Set Steam to Offline Mode\n\n` +
-                `🔌 **How to Enable Offline Mode:**\n\n` +
-                `<a:arrow_white:1514499935125504080> Click Steam in the top-left corner\n` +
-                `<a:arrow_white:1514499935125504080> Select "Go Offline" and confirm\n` +
-                `<a:arrow_white:1514499935125504080> Click on **Settings > Cloud** and DISABLE it\n\n` +
-                `Now, enjoy your game anytime!`
-            )
             .addFields(
                 { name: '<:steam:1514500645967888405> Steam Account', value: account.gameName },
                 { name: 'Username', value: `\`${account.username}\`` },
-                { name: 'Password', value: `\`${account.password}\`` }
+                { name: 'Password', value: `\`${account.password}\`` },
+                { 
+                    name: '⚠️ Important Rules', 
+                    value: `<a:arrow_white:1514499935125504080> Download the game\n` +
+                           `<a:arrow_white:1514499935125504080> Launch the game once in online mode, then close it after 30 seconds (ALT + F4)\n` +
+                           `<a:arrow_white:1514499935125504080> Set Steam to Offline Mode\n\n` +
+                           `🔌 **How to Enable Offline Mode:**\n\n` +
+                           `<a:arrow_white:1514499935125504080> Click Steam in the top-left corner\n` +
+                           `<a:arrow_white:1514499935125504080> Select "Go Offline" and confirm\n` +
+                           `<a:arrow_white:1514499935125504080> Click on **Settings > Cloud** and DISABLE it\n\n` +
+                           `Now, enjoy your game anytime!`
+                }
             )
             .setColor('#ff1493');
             
