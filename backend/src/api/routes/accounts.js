@@ -44,7 +44,8 @@ router.post('/', protect, async (req, res) => {
   const { gameName, username, password, imageUrl } = req.body;
 
   try {
-    const existingAccount = await Account.findOne({ gameName: new RegExp(`^${gameName}$`, 'i') });
+    const escapedGameName = gameName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const existingAccount = await Account.findOne({ gameName: new RegExp(`^${escapedGameName}$`, 'i') });
 
     const account = await Account.create({
       gameName,
@@ -54,25 +55,31 @@ router.post('/', protect, async (req, res) => {
     });
 
     if (!existingAccount) {
-      // Send notification to all approved guilds
-      const approvedGuilds = await Guild.find({ approved: true, commandChannelId: { $exists: true, $ne: null } });
-      for (const guild of approvedGuilds) {
+      // Send notification to all approved guilds asynchronously (fire-and-forget)
+      (async () => {
         try {
-          const channel = await client.channels.fetch(guild.commandChannelId);
-          if (channel) {
-            const embed = new EmbedBuilder()
-              .setTitle('<:steam:1514500645967888405> New Game Added!')
-              .setDescription(`<a:gift:1514500165849972736> A brand new game, **${gameName}**, has just been added to the pool! Use \`/listgame\` to check it out.`)
-              .setColor('#ff1493');
-              
-            if (imageUrl) embed.setImage(imageUrl);
+          const approvedGuilds = await Guild.find({ approved: true, commandChannelId: { $exists: true, $ne: null } });
+          for (const guild of approvedGuilds) {
+            try {
+              const channel = await client.channels.fetch(guild.commandChannelId);
+              if (channel) {
+                const embed = new EmbedBuilder()
+                  .setTitle('<:steam:1514500645967888405> New Game Added!')
+                  .setDescription(`<a:gift:1514500165849972736> A brand new game, **${gameName}**, has just been added to the pool! Use \`/listgame\` to check it out.`)
+                  .setColor('#ff1493');
+                  
+                if (imageUrl) embed.setImage(imageUrl);
 
-            await channel.send({ embeds: [embed] });
+                await channel.send({ embeds: [embed] });
+              }
+            } catch (e) {
+              console.error(`Failed to send new game notification to guild ${guild.guildId}:`, e);
+            }
           }
-        } catch (e) {
-          console.error(`Failed to send new game notification to guild ${guild.guildId}:`, e);
+        } catch (err) {
+          console.error("Error in async discord notification:", err);
         }
-      }
+      })();
     }
 
     await Log.create({
