@@ -40,7 +40,7 @@ export default {
         const workingCount = await Claim.countDocuments({ accountId: { $in: accountIds }, reviewStatus: 'working' });
         const notWorkingCount = await Claim.countDocuments({ accountId: { $in: accountIds }, reviewStatus: 'not_working' });
 
-        description += `<a:arrow_white:1514499935125504080> **${game._id}** (<a:greencheck:1514500469827833977> ${workingCount} | <a:redcheck:1514499774412357682> ${notWorkingCount})\n`;
+        description += `<a:arrow_white:1514499935125504080> **${game._id}**  ( <a:greencheck:1514500469827833977> **${workingCount}**  |  <a:redcheck:1514499774412357682> **${notWorkingCount}** )\n`;
       }
 
       embed.setDescription(description);
