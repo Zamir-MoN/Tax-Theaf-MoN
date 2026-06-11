@@ -99,6 +99,7 @@ export default {
                 { name: '<:steam:1514500645967888405> Steam Account', value: account.gameName },
                 { name: 'Username', value: `\`${account.username}\`` },
                 { name: 'Password', value: `\`${account.password}\`` },
+                { name: '\u200b', value: '\u200b' },
                 { 
                     name: '⚠️ Important Rules', 
                     value: `<a:arrow_white:1514499935125504080> Download the game\n` +
