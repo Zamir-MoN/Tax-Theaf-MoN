@@ -116,7 +116,7 @@ export default {
             .setCustomId(`review_not_working_${claim._id}`)
             .setLabel('Not Working')
             .setEmoji({ id: '1514499774412357682', name: 'redcheck', animated: true })
-            .setStyle(ButtonStyle.Danger);
+            .setStyle(ButtonStyle.Secondary);
 
         const dmRow = new ActionRowBuilder().addComponents(workingBtn, notWorkingBtn);
 

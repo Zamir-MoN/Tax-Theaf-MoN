@@ -81,7 +81,7 @@ export default {
         .setCustomId('cancel_claim')
         .setLabel('Cancel')
         .setEmoji({ id: '1514499774412357682', name: 'redcheck', animated: true })
-        .setStyle(ButtonStyle.Danger);
+        .setStyle(ButtonStyle.Secondary);
 
     const row = new ActionRowBuilder().addComponents(activateBtn, cancelBtn);
 
