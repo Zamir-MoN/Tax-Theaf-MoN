@@ -45,7 +45,7 @@ export default {
         claim.reviewStatus = isWorking ? 'working' : 'not_working';
         await claim.save();
         
-        await interaction.update({ content: '<a:1345834485895139440:1514487421213872218> Thank you for your review!', components: [] });
+        await interaction.update({ content: '<a:trophy:1514487421213872218> Thank you for your review!', components: [] });
       } else if (interaction.customId === 'activate_claim') {
         const modal = new ModalBuilder()
           .setCustomId('verification_modal')
@@ -75,7 +75,7 @@ export default {
         }).populate('accountId');
 
         if (!verificationRecord) {
-            return interaction.editReply({ content: '<a:1379144267712168027:1514494998794469466> Invalid or expired verification code!' });
+            return interaction.editReply({ content: '<a:redcheck:1514494998794469466> Invalid or expired verification code!' });
         }
 
         verificationRecord.used = true;
@@ -84,7 +84,7 @@ export default {
         const account = verificationRecord.accountId;
         
         if (account.status !== 'available') {
-            return interaction.editReply({ content: '<a:1379144267712168027:1514494998794469466> This account is currently disabled and unavailable.' });
+            return interaction.editReply({ content: '<a:redcheck:1514494998794469466> This account is currently disabled and unavailable.' });
         }
 
         const claim = await Claim.create({
@@ -109,20 +109,20 @@ export default {
         const workingBtn = new ButtonBuilder()
             .setCustomId(`review_working_${claim._id}`)
             .setLabel('Working')
-            .setEmoji({ id: '1514494077133918329', name: '1351996788466384968', animated: false })
+            .setEmoji({ id: '1514494077133918329', name: 'crown', animated: false })
             .setStyle(ButtonStyle.Success);
 
         const notWorkingBtn = new ButtonBuilder()
             .setCustomId(`review_not_working_${claim._id}`)
             .setLabel('Not Working')
-            .setEmoji({ id: '1514494998794469466', name: '1379144267712168027', animated: true })
+            .setEmoji({ id: '1514494998794469466', name: 'redcheck', animated: true })
             .setStyle(ButtonStyle.Danger);
 
         const dmRow = new ActionRowBuilder().addComponents(workingBtn, notWorkingBtn);
 
         try {
             await interaction.user.send({ embeds: [dmEmbed], components: [dmRow] });
-            await interaction.editReply({ content: '<a:1312144332135862366:1514494044397633648> Account details have been sent to your DMs!' });
+            await interaction.editReply({ content: '<a:gift:1514494044397633648> Account details have been sent to your DMs!' });
 
             await Log.create({
                 action: 'account_claimed',
@@ -134,7 +134,7 @@ export default {
         } catch (e) {
             console.error("Failed to send DM", e);
             await Claim.findByIdAndDelete(claim._id);
-            await interaction.editReply({ content: '<a:1379144267712168027:1514494998794469466> Failed to send DM. Make sure your DMs are open!' });
+            await interaction.editReply({ content: '<a:redcheck:1514494998794469466> Failed to send DM. Make sure your DMs are open!' });
         }
       }
     }

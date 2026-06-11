@@ -32,7 +32,7 @@ export default {
 
       let description = '';
       for (const game of availableGames) {
-        description += `<a:1400099341578014793:1514487381795934258> **${game._id}** (${game.count} available)\n`;
+        description += `<a:arrow_white:1514487381795934258> **${game._id}** (${game.count} available)\n`;
       }
 
       embed.setDescription(description);
