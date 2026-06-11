@@ -3,6 +3,9 @@ import Account from '../../models/Account.js';
 import Log from '../../models/Log.js';
 import Claim from '../../models/Claim.js';
 import { protect } from '../middleware/auth.js';
+import Guild from '../../models/Guild.js';
+import { client } from '../../index.js';
+import { EmbedBuilder } from 'discord.js';
 
 const router = express.Router();
 
@@ -41,12 +44,36 @@ router.post('/', protect, async (req, res) => {
   const { gameName, username, password, imageUrl } = req.body;
 
   try {
+    const existingAccount = await Account.findOne({ gameName: new RegExp(`^${gameName}$`, 'i') });
+
     const account = await Account.create({
       gameName,
       username,
       password,
       imageUrl,
     });
+
+    if (!existingAccount) {
+      // Send notification to all approved guilds
+      const approvedGuilds = await Guild.find({ approved: true, commandChannelId: { $exists: true, $ne: null } });
+      for (const guild of approvedGuilds) {
+        try {
+          const channel = await client.channels.fetch(guild.commandChannelId);
+          if (channel) {
+            const embed = new EmbedBuilder()
+              .setTitle('<:steam:1514500645967888405> New Game Added!')
+              .setDescription(`<a:gift:1514500165849972736> A brand new game, **${gameName}**, has just been added to the pool! Use \`/listgame\` to check it out.`)
+              .setColor('#ff1493');
+              
+            if (imageUrl) embed.setImage(imageUrl);
+
+            await channel.send({ embeds: [embed] });
+          }
+        } catch (e) {
+          console.error(`Failed to send new game notification to guild ${guild.guildId}:`, e);
+        }
+      }
+    }
 
     await Log.create({
       action: 'account_added',
