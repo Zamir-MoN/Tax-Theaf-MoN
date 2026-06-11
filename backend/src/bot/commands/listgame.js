@@ -50,7 +50,7 @@ export default {
           .setLabel('Get Access')
           .setEmoji({ id: '1514500002549075988', name: 'crown', animated: false })
           .setStyle(ButtonStyle.Link)
-          .setURL('https://discord.com/users/YOUR_DISCORD_ID_HERE') // Replace with your link
+          .setURL('https://discord.com/users/1390721413622534296')
       );
 
       await interaction.editReply({ embeds: [embed], components: [row] });
