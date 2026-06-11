@@ -74,13 +74,13 @@ export default {
     const activateBtn = new ButtonBuilder()
         .setCustomId('activate_claim')
         .setLabel('Activate')
-        .setEmoji({ id: '1514487421213872218', name: 'trophy', animated: true })
+        .setEmoji({ id: '1514500328945356931', name: 'trophy', animated: true })
         .setStyle(ButtonStyle.Success);
 
     const cancelBtn = new ButtonBuilder()
         .setCustomId('cancel_claim')
         .setLabel('Cancel')
-        .setEmoji({ id: '1514494998794469466', name: 'redcheck', animated: true })
+        .setEmoji({ id: '1514499774412357682', name: 'redcheck', animated: true })
         .setStyle(ButtonStyle.Danger);
 
     const row = new ActionRowBuilder().addComponents(activateBtn, cancelBtn);
