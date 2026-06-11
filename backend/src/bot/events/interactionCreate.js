@@ -93,30 +93,28 @@ export default {
             reviewStatus: 'pending'
         });
 
-        const dmEmbed = new EmbedBuilder()
-            .setTitle('<a:gift:1514500165849972736> Here is your Account!')
-            .addFields(
-                { name: '<:steam:1514500645967888405> Steam Account', value: account.gameName },
-                { name: 'Username', value: `\`${account.username}\`` },
-                { name: 'Password', value: `\`${account.password}\`` },
-                { name: '\u200b', value: '\u200b' },
-                { 
-                    name: '⚠️ Important Rules', 
-                    value: `<a:arrow_white:1514499935125504080> Download the game\n` +
-                           `<a:arrow_white:1514499935125504080> Launch the game once in online mode, then close it after 30 seconds (ALT + F4)\n` +
-                           `<a:arrow_white:1514499935125504080> Set Steam to Offline Mode\n\n` +
-                           `🔌 **How to Enable Offline Mode:**\n\n` +
-                           `<a:arrow_white:1514499935125504080> Click Steam in the top-left corner\n` +
-                           `<a:arrow_white:1514499935125504080> Select "Go Offline" and confirm\n` +
-                           `<a:arrow_white:1514499935125504080> Click on **Settings > Cloud** and DISABLE it\n\n` +
-                           `Now, enjoy your game anytime!`
-                }
-            )
-            .setColor('#ff1493');
-            
-        if (account.imageUrl) {
-            dmEmbed.setImage(account.imageUrl);
-        }
+        const dmContent = 
+`<a:gift:1514500165849972736> **Here is your Account!**
+
+<:steam:1514500645967888405> **Steam Account**
+${account.gameName}
+
+**Username**
+\`${account.username}\`
+**Password**
+\`${account.password}\`
+
+⚠️ **Important Rules**
+> » Download the game
+> » Launch the game once in online mode, then close it after 30 seconds (ALT + F4)
+> » Set Steam to Offline Mode
+
+👁️ **How to Enable Offline Mode:**
+> » Click Steam in the top-left corner
+> » Select "Go Offline" and confirm
+> » Click on Settings > Cloud and DISABLE it
+
+**Now, Click Play and enjoy your game anytime!**` + (account.imageUrl ? `\n\n${account.imageUrl}` : '');
 
         const workingBtn = new ButtonBuilder()
             .setCustomId(`review_working_${claim._id}`)
@@ -133,7 +131,7 @@ export default {
         const dmRow = new ActionRowBuilder().addComponents(workingBtn, notWorkingBtn);
 
         try {
-            await interaction.user.send({ embeds: [dmEmbed], components: [dmRow] });
+            await interaction.user.send({ content: dmContent, components: [dmRow] });
             await interaction.editReply({ content: '<a:gift:1514500165849972736> Account details have been sent to your DMs!' });
 
             await Log.create({
