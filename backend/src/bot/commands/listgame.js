@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import Account from '../../models/Account.js';
 import Guild from '../../models/Guild.js';
+import Claim from '../../models/Claim.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -15,10 +16,10 @@ export default {
     }
 
     try {
-      // Aggregate to get unique game names and their counts where status is available
+      // Aggregate to get unique game names where status is available
       const availableGames = await Account.aggregate([
         { $match: { status: 'available' } },
-        { $group: { _id: '$gameName', count: { $sum: 1 } } },
+        { $group: { _id: '$gameName' } },
         { $sort: { _id: 1 } }
       ]);
 
@@ -27,12 +28,19 @@ export default {
       }
 
       const embed = new EmbedBuilder()
-        .setTitle('Available Games')
+        .setTitle('<:steam:1514500645967888405> Available Steam Games')
         .setColor('#ff1493');
 
       let description = '';
       for (const game of availableGames) {
-        description += `<a:arrow_white:1514499935125504080> **${game._id}** (${game.count} available)\n`;
+        // Get all account IDs for this game to count claims
+        const accountsForGame = await Account.find({ gameName: game._id }).select('_id');
+        const accountIds = accountsForGame.map(acc => acc._id);
+
+        const workingCount = await Claim.countDocuments({ accountId: { $in: accountIds }, reviewStatus: 'working' });
+        const notWorkingCount = await Claim.countDocuments({ accountId: { $in: accountIds }, reviewStatus: 'not_working' });
+
+        description += `<a:arrow_white:1514499935125504080> **${game._id}** (<a:greencheck:1514500469827833977> ${workingCount} | <a:redcheck:1514499774412357682> ${notWorkingCount})\n`;
       }
 
       embed.setDescription(description);
