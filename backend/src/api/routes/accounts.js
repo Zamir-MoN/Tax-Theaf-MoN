@@ -38,6 +38,40 @@ router.get('/', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/accounts/export
+// @desc    Export all accounts to JSON
+router.get('/export', protect, async (req, res) => {
+  try {
+    const accounts = await Account.find({}).select('-_id -__v -createdAt -updatedAt').lean();
+    res.json(accounts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// @route   POST /api/accounts/import
+// @desc    Import accounts from JSON
+router.post('/import', protect, async (req, res) => {
+  try {
+    const accounts = req.body;
+    if (!Array.isArray(accounts)) {
+      return res.status(400).json({ message: 'Invalid data format. Expected an array of accounts.' });
+    }
+    
+    await Account.insertMany(accounts);
+    
+    await Log.create({
+      action: 'accounts_imported',
+      details: `Imported ${accounts.length} accounts`,
+      userId: req.admin.email,
+    });
+
+    res.json({ message: `Successfully imported ${accounts.length} accounts.` });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // @route   POST /api/accounts
 // @desc    Create a new account
 router.post('/', protect, async (req, res) => {

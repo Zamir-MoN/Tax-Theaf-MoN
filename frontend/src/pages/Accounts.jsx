@@ -1,12 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../utils/api';
-import { Plus, Trash2, Edit } from 'lucide-react';
+import { Plus, Trash2, Edit, Download, Upload } from 'lucide-react';
 
 const Accounts = () => {
   const [accounts, setAccounts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [formData, setFormData] = useState({ gameName: '', username: '', password: '', imageUrl: '' });
+  const fileInputRef = useRef(null);
+
+  const handleExport = async () => {
+    try {
+      const res = await api.get('/accounts/export');
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(res.data, null, 2));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", "accounts_backup.json");
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    } catch (error) {
+      console.error('Failed to export', error);
+      alert('Failed to export accounts');
+    }
+  };
+
+  const handleImport = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const json = JSON.parse(event.target.result);
+        await api.post('/accounts/import', json);
+        alert('Accounts imported successfully!');
+        fetchAccounts();
+      } catch (error) {
+        console.error('Failed to import', error);
+        alert('Failed to import accounts. Ensure the file is valid JSON.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = null; // Reset input so same file can be selected again
+  };
 
   const fetchAccounts = async () => {
     try {
@@ -65,13 +102,36 @@ const Accounts = () => {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-white">Manage Accounts</h1>
-        <button
-          onClick={handleAdd}
-          className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-          <span>Add Account</span>
-        </button>
+        <div className="flex space-x-4">
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleImport} 
+            accept=".json" 
+            className="hidden" 
+          />
+          <button
+            onClick={() => fileInputRef.current.click()}
+            className="bg-dark-700 hover:bg-dark-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+          >
+            <Upload className="w-5 h-5" />
+            <span>Import</span>
+          </button>
+          <button
+            onClick={handleExport}
+            className="bg-dark-700 hover:bg-dark-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+          >
+            <Download className="w-5 h-5" />
+            <span>Export</span>
+          </button>
+          <button
+            onClick={handleAdd}
+            className="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            <span>Add Account</span>
+          </button>
+        </div>
       </div>
 
       <div className="bg-dark-800 rounded-2xl border border-dark-700 overflow-hidden">
