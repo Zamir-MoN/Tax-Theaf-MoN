@@ -11,8 +11,6 @@ services:
   backend:
     build: ./backend
     container_name: discord-giveaway-backend
-    ports:
-      - "5000:5000"
     env_file:
       - ./backend/.env
     environment:
