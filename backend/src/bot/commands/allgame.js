@@ -5,14 +5,14 @@ import Claim from '../../models/Claim.js';
 
 export default {
   data: new SlashCommandBuilder()
-    .setName('listgame')
+    .setName('allgame')
     .setDescription('Shows available games.'),
   async execute(interaction) {
     await interaction.deferReply();
     // Check if guild is approved
     const guild = await Guild.findOne({ guildId: interaction.guildId });
     if (!guild || !guild.approved) {
-      return interaction.editReply({ content: 'This server is not approved to use the bot. Please run `/gsetup` and contact an admin.', ephemeral: true });
+      return interaction.editReply({ content: 'This server is not approved to use the bot. Please run `/taxsetup` and contact an admin.', ephemeral: true });
     }
 
     try {

@@ -4,7 +4,7 @@ import Log from '../../models/Log.js';
 
 export default {
   data: new SlashCommandBuilder()
-    .setName('gsetup')
+    .setName('taxsetup')
     .setDescription('Configure the bot for this server')
     .addRoleOption(option => 
       option.setName('access_role')

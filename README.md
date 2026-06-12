@@ -5,8 +5,8 @@ A complete solution for distributing game accounts securely via Discord, managed
 ## Features
 
 - **Discord Bot**:
-  - `/gsetup`: Authenticate the server via a setup code.
-  - `/listgame`: View available games.
+  - `/taxsetup`: Authenticate the server via a setup code.
+  - `/allgame`: View available games.
   - `/gameacc`: Request a game account (uses Autocomplete).
   - One-time verification code system (expires in 30s) sent to Discord UI, claims sent via DM.
   - Account locking mechanism to prevent race conditions.

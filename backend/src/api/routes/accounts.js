@@ -65,7 +65,7 @@ router.post('/', protect, async (req, res) => {
               if (channel) {
                 const embed = new EmbedBuilder()
                   .setTitle('<:steam:1514500645967888405> New Game Added!')
-                  .setDescription(`<a:gift:1514500165849972736> A brand new game, **${gameName}**, has just been added to the pool! Use \`/listgame\` to check it out.`)
+                  .setDescription(`<a:gift:1514500165849972736> A brand new game, **${gameName}**, has just been added to the pool! Use \`/allgame\` to check it out.`)
                   .setColor('#ff1493');
                   
                 if (imageUrl) embed.setImage(imageUrl);

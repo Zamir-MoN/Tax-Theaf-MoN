@@ -14,7 +14,7 @@ export default {
     // Check if guild is approved
     const guild = await Guild.findOne({ guildId: interaction.guildId });
     if (!guild || !guild.approved) {
-      return interaction.editReply({ content: 'This server is not approved to use the bot. Please run `/gsetup` and contact an admin.', ephemeral: true });
+      return interaction.editReply({ content: 'This server is not approved to use the bot. Please run `/taxsetup` and contact an admin.', ephemeral: true });
     }
 
     // Check if command is used in the designated channel
