@@ -31,7 +31,16 @@ export default {
         }
       }
     } else if (interaction.isButton()) {
-      if (interaction.customId === 'cancel_claim') {
+      if (interaction.customId === 'refresh_allgame') {
+        try {
+            const { buildGamesEmbed } = await import('../commands/allgame.js');
+            const replyData = await buildGamesEmbed();
+            await interaction.update(replyData);
+        } catch (error) {
+            console.error(error);
+            await interaction.reply({ content: 'Failed to refresh games.', ephemeral: true });
+        }
+      } else if (interaction.customId === 'cancel_claim') {
         await interaction.update({ content: 'Claim cancelled.', components: [], embeds: [] });
       } else if (interaction.customId.startsWith('review_')) {
         const isWorking = interaction.customId.startsWith('review_working_');
