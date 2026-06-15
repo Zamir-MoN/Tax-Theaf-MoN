@@ -30,10 +30,14 @@ export const buildGamesEmbed = async () => {
       const workingCount = await Claim.countDocuments({ accountId: { $in: accountIds }, reviewStatus: 'working' });
       const notWorkingCount = await Claim.countDocuments({ accountId: { $in: accountIds }, reviewStatus: 'not_working' });
 
-      // Pad game name with non-breaking spaces for alignment
-      const paddedName = game._id.padEnd(maxLength, '\u00A0');
+      // Format counts to take up 2 characters space for alignment
+      const wCount = workingCount.toString().padStart(2, ' ');
+      const nwCount = notWorkingCount.toString().padEnd(2, ' ');
 
-      const line = `<a:arrow_white:1514499935125504080> ${paddedName} \u00A0\u00A0 ( <a:greencheck:1514500469827833977> ${workingCount} \u00A0|\u00A0 <a:redcheck:1514499774412357682> ${notWorkingCount} )\n`;
+      // Pad game name with regular spaces and wrap in inline code block for perfect monospace alignment
+      const paddedName = game._id.padEnd(maxLength, ' ');
+
+      const line = `<a:arrow_white:1514499935125504080> \`${paddedName}\` \u00A0 ( <a:greencheck:1514500469827833977> \`${wCount}\` | <a:redcheck:1514499774412357682> \`${nwCount}\` )\n`;
 
       if (currentDescription.length + line.length > 4000) {
         const embed = new EmbedBuilder()
