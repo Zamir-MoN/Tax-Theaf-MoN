@@ -58,7 +58,7 @@ export default {
     const response = await interaction.editReply({ content: 'Please select a game to claim:', components: actionRows, ephemeral: true });
 
     try {
-        const confirmation = await response.awaitMessageComponent({ filter: i => i.user.id === interaction.user.id, time: 60000 });
+        const confirmation = await response.awaitMessageComponent({ filter: i => i.user.id === interaction.user.id });
         
         const gameName = confirmation.values[0];
 
