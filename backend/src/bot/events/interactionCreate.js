@@ -78,7 +78,7 @@ export default {
       }
     } else if (interaction.isModalSubmit()) {
       if (interaction.customId === 'verification_modal') {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferUpdate();
         const enteredCode = interaction.fields.getTextInputValue('code_input');
         const verificationRecord = await VerificationCode.findOne({ 
             userId: interaction.user.id, 
@@ -87,7 +87,8 @@ export default {
         }).populate('accountId');
 
         if (!verificationRecord) {
-            return interaction.editReply({ content: '<a:redcheck:1514499774412357682> Invalid or expired verification code!' });
+            await interaction.editReply({ content: '<a:redcheck:1514499774412357682> Invalid or expired verification code!', embeds: [], components: [] });
+            return;
         }
 
         verificationRecord.used = true;
@@ -96,7 +97,8 @@ export default {
         const account = verificationRecord.accountId;
         
         if (account.status !== 'available') {
-            return interaction.editReply({ content: '<a:redcheck:1514499774412357682> This account is currently disabled and unavailable.' });
+            await interaction.editReply({ content: '<a:redcheck:1514499774412357682> This account is currently disabled and unavailable.', embeds: [], components: [] });
+            return;
         }
 
         const claim = await Claim.create({
@@ -118,15 +120,15 @@ ${account.gameName}
 **Password**
 \`${account.password}\`
 
-⚠️ **Important Rules**
-> » Download the game
-> » Launch the game once in online mode, then close it after 30 seconds (ALT + F4)
-> » Set Steam to Offline Mode
+🔒 **Important Rules**
+> 🔸 Download the game
+> 🔸 Launch the game once in online mode, then close it after 30 seconds (ALT + F4)
+> 🔸 Set Steam to Offline Mode
 
-👁️ **How to Enable Offline Mode:**
-> » Click Steam in the top-left corner
-> » Select "Go Offline" and confirm
-> » Click on Settings > Cloud and DISABLE it
+🕹️ **How to Enable Offline Mode:**
+> 🔸 Click Steam in the top-left corner
+> 🔸 Select "Go Offline" and confirm
+> 🔸 Click on Settings > Cloud and DISABLE it
 
 **Now, Click Play and enjoy your game anytime!**`
             );
@@ -151,7 +153,7 @@ ${account.gameName}
 
         try {
             await interaction.user.send({ embeds: [dmEmbed], components: [dmRow] });
-            await interaction.editReply({ content: '<a:gift:1514500165849972736> Account details have been sent to your DMs!' });
+            await interaction.editReply({ content: '<a:gift:1514500165849972736> Account details have been sent to your DMs!', embeds: [], components: [] });
 
             await Log.create({
                 action: 'account_claimed',
@@ -160,10 +162,14 @@ ${account.gameName}
                 guildId: interaction.guildId
             });
 
+            setTimeout(() => {
+                interaction.deleteReply().catch(() => {});
+            }, 10000);
+
         } catch (e) {
             console.error("Failed to send DM", e);
             await Claim.findByIdAndDelete(claim._id);
-            await interaction.editReply({ content: '<a:redcheck:1514499774412357682> Failed to send DM. Make sure your DMs are open!' });
+            await interaction.editReply({ content: '<a:redcheck:1514499774412357682> Failed to send DM. Make sure your DMs are open!', embeds: [], components: [] });
         }
       }
     }
