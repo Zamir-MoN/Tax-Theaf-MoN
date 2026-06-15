@@ -61,10 +61,6 @@ export const buildGamesEmbed = async (page = 0) => {
         .setStyle(ButtonStyle.Primary)
         .setDisabled(page === 0),
       new ButtonBuilder()
-        .setCustomId(`allgame_refresh_${page}`)
-        .setEmoji('🔄')
-        .setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder()
         .setCustomId(`allgame_next_${page}`)
         .setLabel('Next ▶')
         .setStyle(ButtonStyle.Primary)

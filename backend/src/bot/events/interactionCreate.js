@@ -31,17 +31,7 @@ export default {
         }
       }
     } else if (interaction.isButton()) {
-      if (interaction.customId.startsWith('allgame_refresh_')) {
-        try {
-            const page = parseInt(interaction.customId.replace('allgame_refresh_', ''), 10);
-            const { buildGamesEmbed } = await import('../commands/allgame.js');
-            const replyData = await buildGamesEmbed(page);
-            await interaction.update(replyData);
-        } catch (error) {
-            console.error(error);
-            await interaction.reply({ content: 'Failed to refresh games.', ephemeral: true });
-        }
-      } else if (interaction.customId.startsWith('allgame_prev_') || interaction.customId.startsWith('allgame_next_')) {
+      if (interaction.customId.startsWith('allgame_prev_') || interaction.customId.startsWith('allgame_next_')) {
         let currentPage = 0;
         if (interaction.customId.startsWith('allgame_prev_')) {
             currentPage = parseInt(interaction.customId.replace('allgame_prev_', ''), 10) - 1;
