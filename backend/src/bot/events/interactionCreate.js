@@ -31,23 +31,7 @@ export default {
         }
       }
     } else if (interaction.isButton()) {
-      if (interaction.customId.startsWith('allgame_prev_') || interaction.customId.startsWith('allgame_next_')) {
-        let currentPage = 0;
-        if (interaction.customId.startsWith('allgame_prev_')) {
-            currentPage = parseInt(interaction.customId.replace('allgame_prev_', ''), 10) - 1;
-        } else {
-            currentPage = parseInt(interaction.customId.replace('allgame_next_', ''), 10) + 1;
-        }
-
-        try {
-            const { buildGamesEmbed } = await import('../commands/allgame.js');
-            const replyData = await buildGamesEmbed(currentPage);
-            await interaction.update(replyData);
-        } catch (error) {
-            console.error(error);
-            await interaction.reply({ content: 'Failed to change page.', ephemeral: true });
-        }
-      } else if (interaction.customId === 'cancel_claim') {
+      if (interaction.customId === 'cancel_claim') {
         await interaction.update({ content: 'Claim cancelled.', components: [], embeds: [] });
       } else if (interaction.customId.startsWith('review_')) {
         const isWorking = interaction.customId.startsWith('review_working_');
@@ -79,6 +63,18 @@ export default {
         modal.addComponents(firstActionRow);
 
         await interaction.showModal(modal);
+      }
+    } else if (interaction.isStringSelectMenu()) {
+      if (interaction.customId === 'allgame_page_select') {
+          const page = parseInt(interaction.values[0], 10);
+          try {
+              const { buildGamesEmbed } = await import('../commands/allgame.js');
+              const replyData = await buildGamesEmbed(page);
+              await interaction.update(replyData);
+          } catch (error) {
+              console.error(error);
+              await interaction.reply({ content: 'Failed to change page.', ephemeral: true });
+          }
       }
     } else if (interaction.isModalSubmit()) {
       if (interaction.customId === 'verification_modal') {

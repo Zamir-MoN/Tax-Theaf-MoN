@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder } from 'discord.js';
 import Account from '../../models/Account.js';
 import Guild from '../../models/Guild.js';
 import Claim from '../../models/Claim.js';
@@ -50,22 +50,38 @@ export const buildGamesEmbed = async (page = 0) => {
 
     const embed = new EmbedBuilder()
       .setTitle('<:steam:1514500645967888405> Available Steam Games')
-      .setColor('#ff1493')
+      .setColor('#2b2d31')
+      .setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/512px-Steam_icon_logo.svg.png')
       .setDescription(description)
-      .setFooter({ text: `Page ${page + 1} of ${totalPages}` });
+      .setFooter({ text: `Page ${page + 1} of ${totalPages}` })
+      .setTimestamp();
 
-    const navRow = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`allgame_prev_${page}`)
-        .setLabel('◀ Previous')
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(page === 0),
-      new ButtonBuilder()
-        .setCustomId(`allgame_next_${page}`)
-        .setLabel('Next ▶')
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(page >= totalPages - 1)
-    );
+    const options = [];
+    for (let i = 0; i < totalPages; i++) {
+        const pageStart = i * itemsPerPage;
+        const pageEnd = Math.min(pageStart + itemsPerPage, availableGames.length);
+        const firstGame = availableGames[pageStart]._id;
+        const lastGame = availableGames[pageEnd - 1]._id;
+        
+        let labelDesc = `${firstGame.substring(0, 20)}... to ${lastGame.substring(0, 20)}...`;
+        if (firstGame === lastGame) {
+            labelDesc = firstGame.substring(0, 40);
+        }
+
+        options.push({
+            label: `Page ${i + 1}`,
+            description: labelDesc,
+            value: i.toString(),
+            default: i === page
+        });
+    }
+
+    const selectMenu = new StringSelectMenuBuilder()
+        .setCustomId('allgame_page_select')
+        .setPlaceholder('Select a page to view more games...')
+        .addOptions(options);
+
+    const navRow = new ActionRowBuilder().addComponents(selectMenu);
 
     const linkRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
