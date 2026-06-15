@@ -78,8 +78,6 @@ export const buildGamesEmbed = async (page = 0) => {
     return { content: '', embeds: [embed], components: [navRow, linkRow] };
 };
 
-const lastMessages = new Map();
-
 export default {
   data: new SlashCommandBuilder()
     .setName('allgame')
@@ -93,22 +91,23 @@ export default {
     }
 
     try {
-      const replyData = await buildGamesEmbed();
-      const message = await interaction.editReply(replyData);
-
-      const channelId = interaction.channelId;
-      if (lastMessages.has(channelId)) {
-        try {
-          const oldMsgId = lastMessages.get(channelId);
-          const oldMsg = await interaction.channel.messages.fetch(oldMsgId);
-          if (oldMsg) {
-             await oldMsg.delete();
-          }
-        } catch (e) {
-          // Ignore errors if message was already deleted by a user or missing permissions
+      // Delete old message by checking channel history (survives bot restarts)
+      try {
+        const messages = await interaction.channel.messages.fetch({ limit: 30 });
+        const oldMsg = messages.find(m => 
+            m.author.id === interaction.client.user.id && 
+            m.embeds.length > 0 && 
+            m.embeds[0].title === '<:steam:1514500645967888405> Available Steam Games'
+        );
+        if (oldMsg) {
+           await oldMsg.delete();
         }
+      } catch (e) {
+        // Ignore errors if lacking permissions
       }
-      lastMessages.set(channelId, message.id);
+
+      const replyData = await buildGamesEmbed();
+      await interaction.editReply(replyData);
 
     } catch (error) {
       console.error(error);
