@@ -10,7 +10,7 @@ export default {
     .setDescription('Request an available game account.')
     .addStringOption(option => 
         option.setName('game')
-            .setDescription('Select the game you want to claim')
+            .setDescription('Search the game you want to play')
             .setRequired(true)
             .setAutocomplete(true)
     ),
