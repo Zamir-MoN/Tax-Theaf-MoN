@@ -15,6 +15,9 @@ export const buildGamesEmbed = async () => {
       return { content: 'There are currently no accounts available.', embeds: [], components: [] };
     }
 
+    // Find the maximum length of game names for padding
+    const maxLength = Math.max(...availableGames.map(g => g._id.length));
+
     const embeds = [];
     let currentDescription = '';
     let isFirstEmbed = true;
@@ -27,7 +30,10 @@ export const buildGamesEmbed = async () => {
       const workingCount = await Claim.countDocuments({ accountId: { $in: accountIds }, reviewStatus: 'working' });
       const notWorkingCount = await Claim.countDocuments({ accountId: { $in: accountIds }, reviewStatus: 'not_working' });
 
-      const line = `<a:arrow_white:1514499935125504080> **${game._id}**  ( <a:greencheck:1514500469827833977> **${workingCount}**  |  <a:redcheck:1514499774412357682> **${notWorkingCount}** )\n`;
+      // Pad game name with non-breaking spaces for alignment
+      const paddedName = game._id.padEnd(maxLength, '\u00A0');
+
+      const line = `<a:arrow_white:1514499935125504080> ${paddedName} \u00A0\u00A0 ( <a:greencheck:1514500469827833977> ${workingCount} \u00A0|\u00A0 <a:redcheck:1514499774412357682> ${notWorkingCount} )\n`;
 
       if (currentDescription.length + line.length > 4000) {
         const embed = new EmbedBuilder()
