@@ -15,11 +15,10 @@ export const buildGamesEmbed = async () => {
       return { content: 'There are currently no accounts available.', embeds: [], components: [] };
     }
 
-    const embed = new EmbedBuilder()
-      .setTitle('<:steam:1514500645967888405> Available Steam Games')
-      .setColor('#ff1493');
+    const embeds = [];
+    let currentDescription = '';
+    let isFirstEmbed = true;
 
-    let description = '';
     for (const game of availableGames) {
       // Get all account IDs for this game to count claims
       const accountsForGame = await Account.find({ gameName: game._id }).select('_id');
@@ -28,10 +27,36 @@ export const buildGamesEmbed = async () => {
       const workingCount = await Claim.countDocuments({ accountId: { $in: accountIds }, reviewStatus: 'working' });
       const notWorkingCount = await Claim.countDocuments({ accountId: { $in: accountIds }, reviewStatus: 'not_working' });
 
-      description += `<a:arrow_white:1514499935125504080> **${game._id}**  ( <a:greencheck:1514500469827833977> **${workingCount}**  |  <a:redcheck:1514499774412357682> **${notWorkingCount}** )\n`;
+      const line = `<a:arrow_white:1514499935125504080> **${game._id}**  ( <a:greencheck:1514500469827833977> **${workingCount}**  |  <a:redcheck:1514499774412357682> **${notWorkingCount}** )\n`;
+
+      if (currentDescription.length + line.length > 4000) {
+        const embed = new EmbedBuilder()
+          .setColor('#ff1493')
+          .setDescription(currentDescription);
+
+        if (isFirstEmbed) {
+          embed.setTitle('<:steam:1514500645967888405> Available Steam Games');
+          isFirstEmbed = false;
+        }
+
+        embeds.push(embed);
+        currentDescription = line;
+      } else {
+        currentDescription += line;
+      }
     }
 
-    embed.setDescription(description);
+    if (currentDescription.length > 0) {
+      const embed = new EmbedBuilder()
+        .setColor('#ff1493')
+        .setDescription(currentDescription);
+
+      if (isFirstEmbed) {
+        embed.setTitle('<:steam:1514500645967888405> Available Steam Games');
+      }
+
+      embeds.push(embed);
+    }
 
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
@@ -46,7 +71,7 @@ export const buildGamesEmbed = async () => {
         .setStyle(ButtonStyle.Secondary)
     );
 
-    return { content: '', embeds: [embed], components: [row] };
+    return { content: '', embeds: embeds, components: [row] };
 };
 
 export default {
