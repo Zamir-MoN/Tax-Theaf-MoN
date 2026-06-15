@@ -3,7 +3,7 @@ import Account from '../../models/Account.js';
 import Guild from '../../models/Guild.js';
 import Claim from '../../models/Claim.js';
 
-export const buildGamesEmbed = async () => {
+export const buildGamesEmbed = async (page = 0) => {
     // Aggregate to get unique game names where status is available
     const availableGames = await Account.aggregate([
       { $match: { status: 'available' } },
@@ -15,14 +15,22 @@ export const buildGamesEmbed = async () => {
       return { content: 'There are currently no accounts available.', embeds: [], components: [] };
     }
 
+    const itemsPerPage = 15;
+    const totalPages = Math.ceil(availableGames.length / itemsPerPage);
+    
+    // Ensure page is within bounds
+    page = Math.max(0, Math.min(page, totalPages - 1));
+
+    const start = page * itemsPerPage;
+    const end = start + itemsPerPage;
+    const gamesPage = availableGames.slice(start, end);
+
     // Find the maximum length of game names for padding
     const maxLength = Math.max(...availableGames.map(g => g._id.length));
 
-    const embeds = [];
-    let currentDescription = '';
-    let isFirstEmbed = true;
+    let description = '';
 
-    for (const game of availableGames) {
+    for (const game of gamesPage) {
       // Get all account IDs for this game to count claims
       const accountsForGame = await Account.find({ gameName: game._id }).select('_id');
       const accountIds = accountsForGame.map(acc => acc._id);
@@ -37,51 +45,41 @@ export const buildGamesEmbed = async () => {
       // Pad game name with regular spaces and wrap in inline code block for perfect monospace alignment
       const paddedName = game._id.padEnd(maxLength, ' ');
 
-      const line = `<a:arrow_white:1514499935125504080> \`${paddedName}\` \u00A0 ( <a:greencheck:1514500469827833977> \`${wCount}\` | <a:redcheck:1514499774412357682> \`${nwCount}\` )\n`;
-
-      if (currentDescription.length + line.length > 4000) {
-        const embed = new EmbedBuilder()
-          .setColor('#ff1493')
-          .setDescription(currentDescription);
-
-        if (isFirstEmbed) {
-          embed.setTitle('<:steam:1514500645967888405> Available Steam Games');
-          isFirstEmbed = false;
-        }
-
-        embeds.push(embed);
-        currentDescription = line;
-      } else {
-        currentDescription += line;
-      }
+      description += `<a:arrow_white:1514499935125504080> \`${paddedName}\` \u00A0 ( <a:greencheck:1514500469827833977> \`${wCount}\` | <a:redcheck:1514499774412357682> \`${nwCount}\` )\n`;
     }
 
-    if (currentDescription.length > 0) {
-      const embed = new EmbedBuilder()
-        .setColor('#ff1493')
-        .setDescription(currentDescription);
+    const embed = new EmbedBuilder()
+      .setTitle('<:steam:1514500645967888405> Available Steam Games')
+      .setColor('#ff1493')
+      .setDescription(description)
+      .setFooter({ text: `Page ${page + 1} of ${totalPages}` });
 
-      if (isFirstEmbed) {
-        embed.setTitle('<:steam:1514500645967888405> Available Steam Games');
-      }
+    const navRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`allgame_prev_${page}`)
+        .setLabel('◀ Previous')
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(page === 0),
+      new ButtonBuilder()
+        .setCustomId(`allgame_refresh_${page}`)
+        .setEmoji('🔄')
+        .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId(`allgame_next_${page}`)
+        .setLabel('Next ▶')
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(page >= totalPages - 1)
+    );
 
-      embeds.push(embed);
-    }
-
-    const row = new ActionRowBuilder().addComponents(
+    const linkRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setLabel('Get Access')
         .setEmoji({ id: '1514500002549075988', name: 'crown', animated: false })
         .setStyle(ButtonStyle.Link)
-        .setURL('https://discord.com/users/1390721413622534296'),
-      new ButtonBuilder()
-        .setCustomId('refresh_allgame')
-        .setLabel('Refresh')
-        .setEmoji('🔄')
-        .setStyle(ButtonStyle.Secondary)
+        .setURL('https://discord.com/users/1390721413622534296')
     );
 
-    return { content: '', embeds: embeds, components: [row] };
+    return { content: '', embeds: [embed], components: [navRow, linkRow] };
 };
 
 export default {
