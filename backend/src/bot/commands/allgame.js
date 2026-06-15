@@ -78,6 +78,8 @@ export const buildGamesEmbed = async (page = 0) => {
     return { content: '', embeds: [embed], components: [navRow, linkRow] };
 };
 
+const lastMessages = new Map();
+
 export default {
   data: new SlashCommandBuilder()
     .setName('allgame')
@@ -92,7 +94,22 @@ export default {
 
     try {
       const replyData = await buildGamesEmbed();
-      await interaction.editReply(replyData);
+      const message = await interaction.editReply(replyData);
+
+      const channelId = interaction.channelId;
+      if (lastMessages.has(channelId)) {
+        try {
+          const oldMsgId = lastMessages.get(channelId);
+          const oldMsg = await interaction.channel.messages.fetch(oldMsgId);
+          if (oldMsg) {
+             await oldMsg.delete();
+          }
+        } catch (e) {
+          // Ignore errors if message was already deleted by a user or missing permissions
+        }
+      }
+      lastMessages.set(channelId, message.id);
+
     } catch (error) {
       console.error(error);
       await interaction.editReply({ content: 'Failed to fetch available games.', ephemeral: true });
