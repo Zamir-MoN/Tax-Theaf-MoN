@@ -17,7 +17,10 @@ import statsRoutes from './api/routes/stats.js';
 dotenv.config();
 
 // Connect Database
-connectDB();
+import mongoose from 'mongoose';
+connectDB().then(() => {
+    mongoose.connection.collection('verificationcodes').dropIndex('createdAt_1').catch(() => {});
+});
 
 const app = express();
 

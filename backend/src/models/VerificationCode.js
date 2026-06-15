@@ -22,7 +22,6 @@ const verificationCodeSchema = mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now,
-      expires: 30, // Auto delete document after 30 seconds
     },
   }
 );
